@@ -1,0 +1,31 @@
+{
+  "name": "text",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "@skidding/react-codemirror": "^1.0.2",
+    "babel-preset-stage-1": "^6.24.1",
+    "electron": "^1.4.14",
+    "foreman": "^2.0.0",
+    "react-codemirror": "github:skidding/react-codemirror",
+    "react-dom": "^15.6.2",
+    "react-scripts": "0.8.5",
+    "react-split-pane": "^0.1.77"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "draft-js": "^0.10.5",
+    "material-ui": "^0.20.0",
+    "react": "^15.4.2"
+  },
+  "homepage": "./",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+    "dev": "nf start -p 3000"
+  }
+}
