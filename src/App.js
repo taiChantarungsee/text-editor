@@ -1,9 +1,13 @@
 import React, { Component } from 'react';
+const electron = window.require('electron'); //Switching to different style because of issue with webpack.
+const ipc = electron.ipcRenderer;
+
 import SplitPane from 'react-split-pane';
 import logo from './logo.svg';
 import './App.css';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import MyAwesomeReactComponent from './MyAwesomeReactComponent';
+import GoogleButtonComponent from './GoogleButtonComponent';
+import GoogleModalComponent from './GoogleModalComponent';
 import Editor from './editor.js';
 
 class App extends Component {
@@ -23,7 +27,8 @@ class App extends Component {
           <h1 className="App-title">Welcome to the text editor</h1>
         </header>
         <MuiThemeProvider>
-          <MyAwesomeReactComponent />
+          <GoogleButtonComponent />
+          <GoogleModalComponent />
         </MuiThemeProvider>
         <SplitPane split="vertical" defaultSize="50%">
           <div className="editor-pane">

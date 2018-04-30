@@ -6,6 +6,165 @@ const BrowserWindow = electron.BrowserWindow;
 
 const path = require('path');
 const url = require('url');
+const fs = require('fs');
+
+const Menu = electron.Menu;
+
+let template = [{
+    label: 'Edit App',
+    submenu: [{
+        label: 'Undo',
+        accelerator: 'CmdOrCtrl+Z',
+        role: 'undo'
+    }, {
+        label: 'Redo',
+        accelerator: 'Shift+CmdOrCtrl+Z',
+        role: 'redo'
+    }, {
+        type: 'separator'
+    }, {
+        label: 'Cut',
+        accelerator: 'CmdOrCtrl+X',
+        role: 'cut'
+    }, {
+        label: 'Copy',
+        accelerator: 'CmdOrCtrl+C',
+        role: 'copy'
+    }, {
+        label: 'Paste',
+        accelerator: 'CmdOrCtrl+V',
+        role: 'paste'
+    }, {
+        label: 'Select All',
+        accelerator: 'CmdOrCtrl+A',
+        role: 'selectall'
+    }]
+    }, {
+        label: 'View',
+        submenu: [{
+        label: 'Reload',
+        accelerator: 'CmdOrCtrl+R',
+    click: function (item, focusedWindow) {
+    if (focusedWindow) {
+    // on reload, start fresh and close any old
+    // open secondary windows
+            if (focusedWindow.id === 1) {
+            BrowserWindow.getAllWindows().forEach(function (win) {
+                if (win.id > 1) {
+                win.close()
+                    }
+                })
+           }   
+            focusedWindow.reload()
+        }
+    }
+    }, {
+    label: 'Toggle Full Screen',
+    accelerator: (function () {
+        if (process.platform === 'darwin') {
+            return 'Ctrl+Command+F'
+        } else {
+            return 'F11'
+        }
+    })(),
+    click: function (item, focusedWindow) {
+        if (focusedWindow) {
+            focusedWindow.setFullScreen(!focusedWindow.isFullScreen())
+        }
+    }
+    }, {
+    label: 'Toggle Developer Tools',
+    accelerator: (function () {
+    if (process.platform === 'darwin') {
+        return 'Alt+Command+I'
+    } else {
+        return 'Ctrl+Shift+I'
+        }
+    })(),
+        click: function (item, focusedWindow) {
+        if (focusedWindow) {
+                focusedWindow.toggleDevTools()
+            }
+        }
+    }]
+   }]
+   
+   let windowMenu = {
+        label: 'Window',
+        role: 'window',
+        submenu: [{
+            label: 'Minimize',
+            accelerator: 'CmdOrCtrl+M',
+            role: 'minimize'
+        }, {
+        label: 'Close',
+        accelerator: 'CmdOrCtrl+W',
+        role: 'close'
+        }, {
+            type: 'separator'
+        }, {
+        label: 'Reopen Window',
+        accelerator: 'CmdOrCtrl+Shift+T',
+        enabled: false,
+        key: 'reopenMenuItem',
+        click: function () {
+            app.emit('activate')
+        }
+    }]
+   }
+   
+   template.push(windowMenu)
+   
+   if (process.platform === 'darwin') {
+       let name = 'App Name'
+       template.unshift({
+           label: name,
+           submenu: [
+               {
+                   label: `About ${name}`,
+                   role: 'about',
+               },
+               { type: 'separator' },
+                   {
+                       label: 'Preferences',
+                       accelerator: 'Command+,',
+                       click: appPrefs
+                   },
+               { type: 'separator' },
+                   {
+                       label: 'Services',
+                       role: 'services',
+                       submenu: [],
+                   },
+               { type: 'separator' },
+               {
+                   label: `Hide ${name}`,
+                   accelerator: 'Command+H',
+                   role: 'hide',
+               }, {
+                   label: 'Hide Others',
+                   accelerator: 'Command+Alt+H',
+                   role: 'hideothers',
+               }, {
+                   label: 'Show All',
+                   role: 'unhide',
+               },
+               { type: 'separator' },
+               {
+                   label: `Quit ${name}`,
+                   accelerator: 'Command+Q',
+                   click: function () {
+                       app.quit()
+                   }
+               }]
+           })
+           template[3].submenu.push({
+               type: 'separator'
+           }, {
+               label: 'Bring All to Front',
+               role: 'front'
+           })
+       }
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -24,6 +183,11 @@ function createWindow() {
     // and load the index.html of the app.
     mainWindow.loadURL('http://localhost:3000');
 
+    //Wait for the 'ready-to-show' event to be emitted before displaying our window
+    mainWindow.once('ready-to-show', () => {
+	    mainWindow.show()
+    })
+
     // Open the DevTools.
     mainWindow.webContents.openDevTools();
 
@@ -39,7 +203,11 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', function() {
+	const menu = Menu.buildFromTemplate(template)
+	Menu.setApplicationMenu(menu)
+	createWindow() //Instead of passing the function name we've used it at the end of another one, that we pass.
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -58,5 +226,11 @@ app.on('activate', function () {
     }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+//Functions for saving data
+ipc.on('data', (event, payload) => {
+    text = payload;
+    const write = (text) => {
+        let fileName = `${app.getPath('documents')}/${post.id}-note.txt`;
+        fs.writeFileSync(fileName, post);
+      };
+});
