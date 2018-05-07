@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Modal from 'material-ui/Modal';
 
-class SimpleModal extends Component {
+class GoogleModalComponent extends Component {
     state = {
       open: false,
     };

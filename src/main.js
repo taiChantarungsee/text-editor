@@ -8,6 +8,7 @@ const path = require('path');
 const url = require('url');
 const fs = require('fs');
 
+const ipc = electron.ipcMain
 const Menu = electron.Menu;
 
 let template = [{
